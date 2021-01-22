@@ -9,6 +9,8 @@ public interface SnippetService {
 
     Snippet getSnippet(String snippetName);
 
+    Snippet likeSnippet(String snippetName);
+
     boolean snippetExists(String snippetName);
 
 }
