@@ -1,7 +1,7 @@
 package com.victor.snippetgenerator.service.impl;
 
-import com.victor.snippetgenerator.models.SnippetRequest;
 import com.victor.snippetgenerator.models.Snippet;
+import com.victor.snippetgenerator.models.SnippetRequest;
 import com.victor.snippetgenerator.service.SnippetService;
 import org.springframework.stereotype.Service;
 
@@ -23,18 +23,19 @@ public class SnippetServiceImpl implements SnippetService {
         String snippetContent = snippetRequest.getSnippet();
 
         // If snippet already exists with the same name provided, it updates it with the new info provided
-        if(snippetExists(snippetRequest.getName())){
-            for (Snippet snippet: snippetList){
-                if(snippet.getName().equals(snippetRequest.getName())){
+        if (snippetExists(snippetRequest.getName())) {
+            for (Snippet snippet : snippetList) {
+                if (snippet.getName().equals(snippetRequest.getName())) {
                     snippet.setExpiresAt(expiresAt);
                     snippet.setSnippet(snippetContent);
+                    snippet.setLikes(0);
                     return snippet;
                 }
             }
         }
 
         // If snippet did not exist before, it creates a new one
-        Snippet snippet = new Snippet(url, snippetRequest.getName(), expiresAt, snippetContent);
+        Snippet snippet = new Snippet(url, snippetRequest.getName(), expiresAt, snippetContent, 0);
         snippetList.add(snippet);
         return snippet;
     }
@@ -42,9 +43,9 @@ public class SnippetServiceImpl implements SnippetService {
     @Override
     public Snippet getSnippet(String snippetName) {
         if (!snippetExists(snippetName)) return null;
-        for(Snippet snippet: snippetList){
-            if(snippet.getName().equals(snippetName)){
-                if(LocalDateTime.now().isAfter(snippet.getExpiresAt())){
+        for (Snippet snippet : snippetList) {
+            if (snippet.getName().equals(snippetName)) {
+                if (LocalDateTime.now().isAfter(snippet.getExpiresAt())) {
                     return null;
                 } else {
                     snippet.setExpiresAt(snippet.getExpiresAt().plusSeconds(30));
@@ -56,11 +57,24 @@ public class SnippetServiceImpl implements SnippetService {
     }
 
     @Override
+    public Snippet likeSnippet(String snippetName) {
+        if (!snippetExists(snippetName)) return null;
+        for (Snippet snippet : snippetList) {
+            if (snippet.getName().equals(snippetName)) {
+                snippet.setLikes(snippet.getLikes() + 1);
+                snippet.setExpiresAt(snippet.getExpiresAt().plusSeconds(30));
+                return snippet;
+            }
+        }
+        return null;
+    }
+
+    @Override
     public boolean snippetExists(String snippetName) {
         return snippetList.stream().anyMatch(snippet -> snippet.getName().equals(snippetName));
     }
 
-    private Optional<Snippet> getSnippetByName(String snippetName){
+    private Optional<Snippet> getSnippetByName(String snippetName) {
         return snippetList.stream().filter(snippet -> snippet.getName().equals(snippetName)).findFirst();
     }
 

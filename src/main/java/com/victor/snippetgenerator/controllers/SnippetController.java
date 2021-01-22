@@ -32,4 +32,11 @@ public class SnippetController {
         if(snippet == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sorry... The snippet with " + snippetName + " does not exist or has expired");
         return ResponseEntity.ok(snippet);
     }
+
+    @PostMapping(value = "/{snippetName}/like", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> likeSnippet (@PathVariable("snippetName") String snippetName){
+        Snippet snippet = snippetService.likeSnippet(snippetName);
+        if(snippet == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sorry... The snippet with " + snippetName + " does not exist");
+        return ResponseEntity.ok(snippet);
+    }
 }

@@ -19,5 +19,5 @@ public class Snippet {
 
     String snippet;
 
-
+    Integer likes;
 }
